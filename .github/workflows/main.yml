@@ -1,0 +1,75 @@
+name: Deployment to store themes!!
+on: 
+  push:
+    branches: [main, staging, dev]
+      
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.env.outputs.env_prefix }}
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1
+          bundler: 'latest'
+
+      - name: Extract branch name from git ref
+        shell: bash
+        run: |
+          echo "BRANCH_PREFIX=$(echo ${GITHUB_REF#refs/heads/} | sed 's|\([^/]*\).*$|\1|')" >> $GITHUB_ENV
+
+      - name: Print output
+        run: |
+          echo "BRANCH_PREFIX = $BRANCH_PREFIX"
+
+      - name: Set env prefix
+        shell: bash
+        run: |
+          if [ $BRANCH_PREFIX == "main" ]
+          then
+            echo "ENV_PREFIX=MAIN" >> $GITHUB_ENV
+          elif [ $BRANCH_PREFIX == "staging" ]
+          then
+            echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV
+          elif [ $BRANCH_PREFIX == "dev" ]
+          then
+            echo "ENV_PREFIX=DEV" >> $GITHUB_ENV           
+          else
+            echo "ENV_PREFIX=$(echo ${BRANCH_PREFIX} | tr '[a-z]' '[A-Z]')" >> $GITHUB_ENV
+          fi
+          echo "${ENV_PREFIX}"        
+
+      - name: Print output
+        id: env
+        run: |
+          echo "ENV_PREFIX = $ENV_PREFIX"  
+          echo "::set-output name=env_prefix::$(echo $ENV_PREFIX)"
+
+      - name: Set env variable
+        env:
+          SHOP_STORE: "${{ env.ENV_PREFIX }}_STORE"
+          SHOP_THEME_TOKEN: "${{ env.ENV_PREFIX }}_THEME_TOKEN"
+          SHOP_THEME_ID: "${{ env.ENV_PREFIX }}_THEME_ID"
+        run: |
+          echo "SHOP_STORE=${{ secrets[env.SHOP_STORE] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_ID=${{ secrets[env.SHOP_THEME_ID] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_TOKEN=${{ secrets[env.SHOP_THEME_TOKEN] }}" >> $GITHUB_ENV
+
+      - name: Print env variable
+        run: |
+          echo "Store SHOP_STORE = $SHOP_STORE"
+
+      - name: Install Shopify CLI
+        run:  npm install & npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
+
+      - name: Deploy/Shopify Push
+        run: shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN
