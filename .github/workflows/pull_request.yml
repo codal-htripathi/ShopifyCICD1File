@@ -1,0 +1,31 @@
+name: Create a pull request on main branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        required: true
+      version:
+        description: 'Enter release version label'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: pull-request
+        id: pr
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: "staging"
+          destination_branch: "main"
+          pr_title: ${{ github.event.inputs.title }} - ${{ github.event.inputs.version }}
+          pr_label: ${{ github.event.inputs.version }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
