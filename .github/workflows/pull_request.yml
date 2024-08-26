@@ -28,4 +28,4 @@ jobs:
           destination_branch: "main"
           pr_title: ${{ github.event.inputs.title }} - ${{ github.event.inputs.version }}
           pr_label: ${{ github.event.inputs.version }}
-          github_token: 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
+          github_token: ${{ secrets.GITHUB_TOKEN }}
