@@ -16,7 +16,7 @@ jobs:
 
       - name: "Checkout Wiki"
         run: |
-          git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
+          git clone https://github.com/<your-username>/<your-repo>.wiki.git
           cd ShopifyCICD1File.wiki
           cat version.textile
 
@@ -83,4 +83,8 @@ jobs:
           git config user.email "actions@github.com"
           git add version.textile
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
-          git push
+          
+          # Authenticate using the GITHUB_TOKEN
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/<your-username>/<your-repo>.wiki.git
+          
+          git push origin main
