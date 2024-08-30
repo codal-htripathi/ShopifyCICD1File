@@ -85,6 +85,6 @@ jobs:
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
           
           # Authenticate using the GITHUB_TOKEN
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/<your-username>/<your-repo>.wiki.git
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           
           git push origin main
