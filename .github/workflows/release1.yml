@@ -18,12 +18,12 @@ jobs:
         run: |
           git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           cd ShopifyCICD1File.wiki
-          cat version.txt
+          cat version.textile
 
       - name: "Get the latest tag from Wiki"
         id: tag
         run: |
-          latest_tag=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' ShopifyCICD1File.wiki/version.txt | tail -n 1 || echo "v0.0.0")
+          latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' ShopifyCICD1File.wiki/version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
           echo "Latest tag from Wiki: $latest_tag"
           echo "::set-output name=latest_tag::$latest_tag"
 
@@ -78,9 +78,9 @@ jobs:
       - name: "Update Wiki with New Version"
         run: |
           cd ShopifyCICD1File.wiki
-          echo "IND_RELEASE-${{ steps.next_version.outputs.next_version }}" > version.txt
+          sed -i 's/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g' version.textile
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add version.txt
+          git add version.textile
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
           git push
