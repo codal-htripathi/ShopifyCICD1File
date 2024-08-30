@@ -1,4 +1,4 @@
-name: Create a pull request on main branch.
+name: Create a pull request on master branch.
 
 on:
   workflow_dispatch:
