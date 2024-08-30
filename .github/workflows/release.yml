@@ -1,79 +1,79 @@
-name: "tagged-release"
+# name: "tagged-release"
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  tagged-release:
-    name: "Tagged Release"
-    runs-on: "ubuntu-latest"
+# jobs:
+#   tagged-release:
+#     name: "Tagged Release"
+#     runs-on: "ubuntu-latest"
 
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v3
+#     steps:
+#       - name: "Checkout code"
+#         uses: actions/checkout@v3
 
-      - name: "Set up Git"
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+#       - name: "Set up Git"
+#         run: |
+#           git config user.name "GitHub Actions"
+#           git config user.email "actions@github.com"
 
-      - name: "Fetch tags"
-        run: |
-          git fetch --tags
+#       - name: "Fetch tags"
+#         run: |
+#           git fetch --tags
 
-      - name: "Get the latest tag"
-        id: tag
-        run: |
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` || echo "v0.0.0")
-          echo "Latest tag: $latest_tag"
-          echo "::set-output name=latest_tag::$latest_tag"
+#       - name: "Get the latest tag"
+#         id: tag
+#         run: |
+#           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` || echo "v0.0.0")
+#           echo "Latest tag: $latest_tag"
+#           echo "::set-output name=latest_tag::$latest_tag"
 
-      - name: "Get version type from commit message"
-        id: get_version_type
-        run: |
-          version_type=$(git log -1 --pretty=%B | grep -oE 'patch|minor|major' || echo "patch")
-          echo "::set-output name=version_type::$version_type"
+#       - name: "Get version type from commit message"
+#         id: get_version_type
+#         run: |
+#           version_type=$(git log -1 --pretty=%B | grep -oE 'patch|minor|major' || echo "patch")
+#           echo "::set-output name=version_type::$version_type"
 
-      - name: "Calculate next version"
-        id: next_version
-        run: |
-          latest_tag=${{ steps.tag.outputs.latest_tag }}
-          version_type=${{ steps.get_version_type.outputs.version_type }}
-          IFS='.' read -r -a parts <<< "${latest_tag/v/}"
+#       - name: "Calculate next version"
+#         id: next_version
+#         run: |
+#           latest_tag=${{ steps.tag.outputs.latest_tag }}
+#           version_type=${{ steps.get_version_type.outputs.version_type }}
+#           IFS='.' read -r -a parts <<< "${latest_tag/v/}"
           
-          if [ "$version_type" = "patch" ]; then
-            next_patch=$((parts[2]+1))
-            next_version="v${parts[0]}.${parts[1]}.$next_patch"
-          elif [ "$version_type" = "minor" ]; then
-            next_minor=$((parts[1]+1))
-            next_version="v${parts[0]}.$next_minor.0"
-          elif [ "$version_type" = "major" ]; then
-            next_major=$((parts[0]+1))
-            next_version="v$next_major.0.0"
-          fi
+#           if [ "$version_type" = "patch" ]; then
+#             next_patch=$((parts[2]+1))
+#             next_version="v${parts[0]}.${parts[1]}.$next_patch"
+#           elif [ "$version_type" = "minor" ]; then
+#             next_minor=$((parts[1]+1))
+#             next_version="v${parts[0]}.$next_minor.0"
+#           elif [ "$version_type" = "major" ]; then
+#             next_major=$((parts[0]+1))
+#             next_version="v$next_major.0.0"
+#           fi
 
-          echo "Next version: $next_version"
-          echo "::set-output name=next_version::$next_version"
+#           echo "Next version: $next_version"
+#           echo "::set-output name=next_version::$next_version"
 
-      - name: "Build & test"
-        run: |
-          echo "done!"
+#       - name: "Build & test"
+#         run: |
+#           echo "done!"
 
-      - name: "Create new tag"
-        run: |
-          git tag ${{ steps.next_version.outputs.next_version }}
-          git push origin ${{ steps.next_version.outputs.next_version }}
+#       - name: "Create new tag"
+#         run: |
+#           git tag ${{ steps.next_version.outputs.next_version }}
+#           git push origin ${{ steps.next_version.outputs.next_version }}
 
-      - name: "Create GitHub Release"
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.next_version.outputs.next_version }}"
-          prerelease: false
-          draft: false
-          title: "Release ${{ steps.next_version.outputs.next_version }}"
-          files: |
-            LICENSE.txt
-            *.jar
+#       - name: "Create GitHub Release"
+#         uses: "marvinpinto/action-automatic-releases@latest"
+#         with:
+#           repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#           automatic_release_tag: "${{ steps.next_version.outputs.next_version }}"
+#           prerelease: false
+#           draft: false
+#           title: "Release ${{ steps.next_version.outputs.next_version }}"
+#           files: |
+#             LICENSE.txt
+#             *.jar
