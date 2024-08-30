@@ -16,7 +16,7 @@ jobs:
 
       - name: "Checkout Wiki"
         run: |
-          git clone https://github.com/<your-username>/<your-repo>.wiki.git
+          git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           cd ShopifyCICD1File.wiki
           cat version.textile
 
