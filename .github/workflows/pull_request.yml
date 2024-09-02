@@ -1,4 +1,4 @@
-name: Create a pull request on main branch.
+name: Create a pull request on master branch
 
 on:
   workflow_dispatch:
@@ -18,14 +18,23 @@ jobs:
   create_pull_request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+
+      - name: Ensure branches exist
+        run: |
+          git fetch origin
+          git checkout master || git checkout -b master origin/master
+          git checkout staging || git checkout -b staging origin/staging
 
       - name: pull-request
         id: pr
         uses: repo-sync/pull-request@v2
         with:
           source_branch: "staging"
-          destination_branch: "main"
+          destination_branch: "master"
           pr_title: ${{ github.event.inputs.title }} - ${{ github.event.inputs.version }}
           pr_label: ${{ github.event.inputs.version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}

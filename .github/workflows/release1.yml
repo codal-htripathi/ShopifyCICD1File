@@ -83,8 +83,9 @@ jobs:
           git config user.email "actions@github.com"
           git add version.textile
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
-          
-          # Authenticate using the GITHUB_TOKEN
+
+          # Use the correct branch name
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           
-          git push origin main
+          # Push to the correct branch (likely master)
+          git push origin master
