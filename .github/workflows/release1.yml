@@ -18,6 +18,7 @@ jobs:
         run: |
           git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           cd ShopifyCICD1File.wiki
+          git checkout main || git checkout -b main
           cat version.textile
 
       - name: "Get the latest tag from Wiki"
@@ -87,5 +88,6 @@ jobs:
           # Use the correct branch name
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           
-          # Push to the correct branch (main)
+          # Ensure we are on the main branch and push changes
+          git checkout main || git checkout -b main
           git push origin main
