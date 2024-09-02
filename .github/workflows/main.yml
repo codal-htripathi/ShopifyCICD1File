@@ -55,21 +55,26 @@ jobs:
           echo "::set-output name=env_prefix::$(echo $ENV_PREFIX)"
 
       - name: Set env variable
-        env:
-          SHOP_STORE: "${{ env.ENV_PREFIX }}_STORE"
-          SHOP_THEME_TOKEN: "${{ env.ENV_PREFIX }}_THEME_TOKEN"
-          SHOP_THEME_ID: "${{ env.ENV_PREFIX }}_THEME_ID"
         run: |
-          echo "SHOP_STORE=${{ secrets[env.SHOP_STORE] }}" >> $GITHUB_ENV
-          echo "SHOP_THEME_ID=${{ secrets[env.SHOP_THEME_ID] }}" >> $GITHUB_ENV
-          echo "SHOP_THEME_TOKEN=${{ secrets[env.SHOP_THEME_TOKEN] }}" >> $GITHUB_ENV
+          echo "SHOP_STORE=${{ secrets[env.ENV_PREFIX + '_STORE'] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_ID=${{ secrets[env.ENV_PREFIX + '_THEME_ID'] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_TOKEN=${{ secrets[env.ENV_PREFIX + '_THEME_TOKEN'] }}" >> $GITHUB_ENV
 
-      - name: Print env variable
+      - name: Print env variables
         run: |
-          echo "Store SHOP_STORE = $SHOP_STORE"
+          echo "Store: $SHOP_STORE"
+          echo "Theme ID: $SHOP_THEME_ID"
+          echo "Token: $SHOP_THEME_TOKEN"
+
+      - name: Validate environment variables
+        run: |
+          if [ -z "$SHOP_STORE" ] || [ -z "$SHOP_THEME_ID" ] || [ -z "$SHOP_THEME_TOKEN" ]; then
+            echo "Error: Required environment variables are missing."
+            exit 1
+          fi
 
       - name: Install Shopify CLI
         run:  npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
 
       - name: Deploy/Shopify Push
-        run: shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live
+        run: shopify theme push --path src --store=$SHOP_STORE --theme=$SHOP_THEME_ID --password=$SHOP_THEME_TOKEN --allow-live
