@@ -91,7 +91,7 @@ jobs:
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes to commit"
           
           # Correct URL with token
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}/wiki.git
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
           
           git status
           git push origin main
