@@ -1,4 +1,4 @@
-name: Create a pull request on master branch
+name: Create a pull request on main branch
 
 on:
   workflow_dispatch:
@@ -26,27 +26,15 @@ jobs:
       - name: Ensure branches exist
         run: |
           git fetch origin
-          # Check if 'master' exists on remote and create it if it doesn't
-          if git show-ref --verify --quiet refs/remotes/origin/master; then
-            git checkout master || git checkout -b master origin/master
-          else
-            echo "Remote branch 'master' does not exist."
-            exit 1
-          fi
-          # Check if 'staging' exists on remote and create it if it doesn't
-          if git show-ref --verify --quiet refs/remotes/origin/staging; then
-            git checkout staging || git checkout -b staging origin/staging
-          else
-            echo "Remote branch 'staging' does not exist."
-            exit 1
-          fi
+          git checkout main || git checkout -b main origin/main
+          git checkout staging || git checkout -b staging origin/staging
 
-      - name: Create pull request
+      - name: pull-request
         id: pr
         uses: repo-sync/pull-request@v2
         with:
           source_branch: "staging"
-          destination_branch: "master"
+          destination_branch: "main"
           pr_title: ${{ github.event.inputs.title }} - ${{ github.event.inputs.version }}
           pr_label: ${{ github.event.inputs.version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
