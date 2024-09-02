@@ -98,3 +98,11 @@ jobs:
           
           git status
           git push origin main
+
+      - name: "Verify Wiki Update"
+        run: |
+          cd ShopifyCICD1File.wiki
+          git fetch
+          git log -1 --pretty=%B
+          echo "Version file content after push:"
+          cat version.textile
