@@ -26,21 +26,21 @@ jobs:
         id: current_version
         run: |
           cd $(basename "${GITHUB_REPOSITORY}").wiki
-          current_version=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
+          current_version=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
           echo "Current version from Wiki: $current_version"
-          echo "::set-output name=current_version::$current_version"
+          echo "current_version=$current_version" >> $GITHUB_ENV
 
       - name: "Get version type from commit message"
         id: get_version_type
         run: |
           version_type=$(git log -1 --pretty=%B | grep -oE 'patch|minor|major' || echo "patch")
-          echo "::set-output name=version_type::$version_type"
+          echo "version_type=$version_type" >> $GITHUB_ENV
 
       - name: "Calculate next version"
         id: next_version
         run: |
-          current_version=${{ steps.current_version.outputs.current_version }}
-          version_type=${{ steps.get_version_type.outputs.version_type }}
+          current_version=${{ env.current_version }}
+          version_type=${{ env.version_type }}
           IFS='.' read -r -a parts <<< "${current_version/v/}"
           
           if [ "$version_type" = "patch" ]; then
@@ -55,7 +55,7 @@ jobs:
           fi
 
           echo "Next version: $next_version"
-          echo "::set-output name=next_version::$next_version"
+          echo "next_version=$next_version" >> $GITHUB_ENV
 
       - name: "Build & test"
         run: |
@@ -63,17 +63,17 @@ jobs:
 
       - name: "Create new tag"
         run: |
-          git tag ${{ steps.next_version.outputs.next_version }}
-          git push origin ${{ steps.next_version.outputs.next_version }}
+          git tag ${{ env.next_version }}
+          git push origin ${{ env.next_version }}
 
       - name: "Create GitHub Release"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.next_version.outputs.next_version }}"
+          automatic_release_tag: "${{ env.next_version }}"
           prerelease: false
           draft: false
-          title: "Release ${{ steps.next_version.outputs.next_version }}"
+          title: "Release ${{ env.next_version }}"
 
       - name: "Update Wiki with New Version"
         run: |
@@ -82,7 +82,7 @@ jobs:
           cat version.textile
 
           # Update the version in the wiki file
-          sed -i "s/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g" version.textile
+          sed -i "s/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ env.next_version }}/g" version.textile
 
           echo "Updated version.textile contents after update:"
           cat version.textile
@@ -90,7 +90,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add version.textile
-          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes to commit"
+          git commit -m "Update version to ${{ env.next_version }}" || echo "No changes to commit"
           
           # Push changes to the wiki
           git push origin main
