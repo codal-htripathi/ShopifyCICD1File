@@ -1,7 +1,7 @@
 name: Deployment to store themes!!
 on: 
   push:
-    branches: [main, staging, dev]
+    branches: [master, staging, dev]
       
 jobs:
   deploy-dev:
@@ -34,9 +34,9 @@ jobs:
       - name: Set env prefix
         shell: bash
         run: |
-          if [ $BRANCH_PREFIX == "main" ]
+          if [ $BRANCH_PREFIX == "master" ]
           then
-            echo "ENV_PREFIX=MAIN" >> $GITHUB_ENV
+            echo "ENV_PREFIX=MASTER" >> $GITHUB_ENV
           elif [ $BRANCH_PREFIX == "staging" ]
           then
             echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV

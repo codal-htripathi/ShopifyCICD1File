@@ -3,7 +3,7 @@ name: "tagged-release"
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   tagged-release:
@@ -18,14 +18,12 @@ jobs:
         run: |
           git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           cd ShopifyCICD1File.wiki
-          git checkout main || git checkout -b main
           cat version.textile
 
       - name: "Get the latest tag from Wiki"
         id: tag
         run: |
-          cd ShopifyCICD1File.wiki
-          latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
+          latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' ShopifyCICD1File.wiki/version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
           echo "Latest tag from Wiki: $latest_tag"
           echo "::set-output name=latest_tag::$latest_tag"
 
@@ -73,32 +71,21 @@ jobs:
           prerelease: false
           draft: false
           title: "Release ${{ steps.next_version.outputs.next_version }}"
+          files: |
+            LICENSE.txt
+            *.jar
 
       - name: "Update Wiki with New Version"
         run: |
           cd ShopifyCICD1File.wiki
-          echo "Current version.textile contents before update:"
-          cat version.textile
-
           sed -i 's/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g' version.textile
-
-          echo "Current version.textile contents after update:"
-          cat version.textile
-
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add version.textile
-          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes to commit"
-          
-          # Correct URL with token
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
-          
-          git status
-          git push origin main
+          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
 
-      - name: "Verify Wiki Update"
-        run: |
-          cd ShopifyCICD1File.wiki
-          git log -1 --pretty=%B
-          echo "Version file content after push:"
-          cat version.textile
+          # Use the correct branch name
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
+          
+          # Push to the correct branch (likely master)
+          git push origin master
