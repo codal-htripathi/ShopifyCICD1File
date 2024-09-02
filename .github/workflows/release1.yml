@@ -16,15 +16,16 @@ jobs:
 
       - name: "Checkout Wiki"
         run: |
-          git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
-          cd ShopifyCICD1File.wiki
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
+          cd $(basename "${GITHUB_REPOSITORY}").wiki
           git checkout main || git checkout -b main
+          echo "Checked out the Wiki repository."
           cat version.textile
 
       - name: "Get the latest tag from Wiki"
         id: tag
         run: |
-          cd ShopifyCICD1File.wiki
+          cd $(basename "${GITHUB_REPOSITORY}").wiki
           latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
           echo "Latest tag from Wiki: $latest_tag"
           echo "::set-output name=latest_tag::$latest_tag"
@@ -76,14 +77,14 @@ jobs:
 
       - name: "Update Wiki with New Version"
         run: |
-          cd ShopifyCICD1File.wiki
+          cd $(basename "${GITHUB_REPOSITORY}").wiki
           echo "Current version.textile contents before update:"
           cat version.textile
 
-          # Update the version using sed with proper double quotes
+          # Update the version in the wiki file
           sed -i "s/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g" version.textile
 
-          echo "Current version.textile contents after update:"
+          echo "Updated version.textile contents after update:"
           cat version.textile
 
           git config user.name "GitHub Actions"
@@ -91,15 +92,12 @@ jobs:
           git add version.textile
           git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes to commit"
           
-          # Correct URL with token
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
-          
-          git status
+          # Push changes to the wiki
           git push origin main
 
       - name: "Verify Wiki Update"
         run: |
-          cd ShopifyCICD1File.wiki
+          cd $(basename "${GITHUB_REPOSITORY}").wiki
           git log -1 --pretty=%B
           echo "Version file content after push:"
           cat version.textile
