@@ -79,15 +79,17 @@ jobs:
       - name: "Update Wiki with New Version"
         run: |
           cd ShopifyCICD1File.wiki
+          echo "Current version.textile contents before update:"
+          cat version.textile
+
           sed -i 's/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g' version.textile
+
+          echo "Current version.textile contents after update:"
+          cat version.textile
+
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add version.textile
-          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
-
-          # Use the correct branch name
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
-          
-          # Ensure we are on the main branch and push changes
-          git checkout main || git checkout -b main
+          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes to commit"
+          git status
           git push origin main
