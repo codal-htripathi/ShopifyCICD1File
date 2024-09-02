@@ -22,13 +22,13 @@ jobs:
           echo "Checked out the Wiki repository."
           cat version.textile
 
-      - name: "Get the latest tag from Wiki"
-        id: tag
+      - name: "Get the current version from Wiki"
+        id: current_version
         run: |
           cd $(basename "${GITHUB_REPOSITORY}").wiki
-          latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
-          echo "Latest tag from Wiki: $latest_tag"
-          echo "::set-output name=latest_tag::$latest_tag"
+          current_version=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
+          echo "Current version from Wiki: $current_version"
+          echo "::set-output name=current_version::$current_version"
 
       - name: "Get version type from commit message"
         id: get_version_type
@@ -39,9 +39,9 @@ jobs:
       - name: "Calculate next version"
         id: next_version
         run: |
-          latest_tag=${{ steps.tag.outputs.latest_tag }}
+          current_version=${{ steps.current_version.outputs.current_version }}
           version_type=${{ steps.get_version_type.outputs.version_type }}
-          IFS='.' read -r -a parts <<< "${latest_tag/v/}"
+          IFS='.' read -r -a parts <<< "${current_version/v/}"
           
           if [ "$version_type" = "patch" ]; then
             next_patch=$((parts[2]+1))
