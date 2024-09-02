@@ -26,10 +26,22 @@ jobs:
       - name: Ensure branches exist
         run: |
           git fetch origin
-          git checkout master || git checkout -b master origin/master
-          git checkout staging || git checkout -b staging origin/staging
+          # Check if 'master' exists on remote and create it if it doesn't
+          if git show-ref --verify --quiet refs/remotes/origin/master; then
+            git checkout master || git checkout -b master origin/master
+          else
+            echo "Remote branch 'master' does not exist."
+            exit 1
+          fi
+          # Check if 'staging' exists on remote and create it if it doesn't
+          if git show-ref --verify --quiet refs/remotes/origin/staging; then
+            git checkout staging || git checkout -b staging origin/staging
+          else
+            echo "Remote branch 'staging' does not exist."
+            exit 1
+          fi
 
-      - name: pull-request
+      - name: Create pull request
         id: pr
         uses: repo-sync/pull-request@v2
         with:
