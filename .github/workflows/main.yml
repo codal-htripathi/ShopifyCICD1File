@@ -1,12 +1,13 @@
 name: Deployment to store themes!!
-
 on: 
   push:
-    branches: [master, staging, dev]
+    branches: [main, staging, dev]
       
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.env.outputs.env_prefix }}
     strategy:
       matrix:
         node-version: [20.x]
@@ -33,9 +34,9 @@ jobs:
       - name: Set env prefix
         shell: bash
         run: |
-          if [ $BRANCH_PREFIX == "master" ]
+          if [ $BRANCH_PREFIX == "main" ]
           then
-            echo "ENV_PREFIX=MASTER" >> $GITHUB_ENV
+            echo "ENV_PREFIX=MAIN" >> $GITHUB_ENV
           elif [ $BRANCH_PREFIX == "staging" ]
           then
             echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV
@@ -68,18 +69,7 @@ jobs:
           echo "Store SHOP_STORE = $SHOP_STORE"
 
       - name: Install Shopify CLI
-        run: |
-          if [ -f package.json ]; then
-            npm install
-            npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
-          else
-            echo "package.json not found, skipping npm install."
-          fi
+        run:  npm install & npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
 
       - name: Deploy/Shopify Push
-        run: |
-          if [ -z "$SHOP_THEME_ID" ]; then
-            echo "SHOP_THEME_ID is not set"
-            exit 1
-          fi
-          shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live
+        run: shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live

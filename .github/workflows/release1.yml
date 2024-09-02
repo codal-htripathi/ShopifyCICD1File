@@ -3,7 +3,7 @@ name: "tagged-release"
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   tagged-release:
@@ -87,5 +87,5 @@ jobs:
           # Use the correct branch name
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
           
-          # Push to the correct branch (likely master)
-          git push origin master
+          # Push to the correct branch (main)
+          git push origin main
