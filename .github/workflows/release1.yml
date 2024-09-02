@@ -22,13 +22,12 @@ jobs:
           echo "Checked out the Wiki repository."
           cat version.textile
 
-      - name: "Get the current version from Wiki"
+      - name: "Get the current version from GitHub Releases"
         id: current_version
         run: |
-          cd $(basename "${GITHUB_REPOSITORY}").wiki
-          current_version=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-          echo "Current version from Wiki: $current_version"
-          echo "current_version=$current_version" >> $GITHUB_ENV
+          latest_release=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Current version from GitHub Release: $latest_release"
+          echo "current_version=$latest_release" >> $GITHUB_ENV
 
       - name: "Get version type from commit message"
         id: get_version_type
@@ -81,7 +80,7 @@ jobs:
           echo "Current version.textile contents before update:"
           cat version.textile
 
-          # Update the version in the wiki file
+          # Update the version in the wiki file to match the new GitHub release version
           sed -i "s/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ env.next_version }}/g" version.textile
 
           echo "Updated version.textile contents after update:"
