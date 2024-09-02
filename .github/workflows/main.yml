@@ -1,7 +1,7 @@
 name: Deployment to store themes!!
 on: 
   push:
-    branches: [master, staging, dev]
+    branches: [main, staging, dev]
       
 jobs:
   deploy-dev:
@@ -34,9 +34,9 @@ jobs:
       - name: Set env prefix
         shell: bash
         run: |
-          if [ $BRANCH_PREFIX == "master" ]
+          if [ $BRANCH_PREFIX == "main" ]
           then
-            echo "ENV_PREFIX=MASTER" >> $GITHUB_ENV
+            echo "ENV_PREFIX=MAIN" >> $GITHUB_ENV
           elif [ $BRANCH_PREFIX == "staging" ]
           then
             echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV
@@ -69,7 +69,7 @@ jobs:
           echo "Store SHOP_STORE = $SHOP_STORE"
 
       - name: Install Shopify CLI
-        run:  npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
+        run:  npm install & npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
 
       - name: Deploy/Shopify Push
-        run: shopify theme push --path src --store=$MAIN_STORE --theme $MAIN_THEME_ID --password $MAIN_THEME_TOKEN --allow-live
+        run: shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live
