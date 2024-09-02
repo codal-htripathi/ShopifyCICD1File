@@ -1,4 +1,5 @@
 name: Deployment to store themes!!
+
 on: 
   push:
     branches: [master, staging, dev]
@@ -6,8 +7,6 @@ on:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.env.outputs.env_prefix }}
     strategy:
       matrix:
         node-version: [20.x]
@@ -69,7 +68,25 @@ jobs:
           echo "Store SHOP_STORE = $SHOP_STORE"
 
       - name: Install Shopify CLI
-        run:  npm install & npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
+        run: |
+          if [ -f package.json ]; then
+            npm install
+            npm install -g @shopify/cli@3.57.1 @shopify/theme@3.57.1
+          else
+            echo "package.json not found, skipping npm install."
+          fi
+
+      - name: Update PATH to include npm global bin
+        run: |
+          echo "Adding npm global bin to PATH"
+          echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
+          echo "$HOME/.npm/bin" >> $GITHUB_PATH
+          echo "$HOME/.npm-global/lib/node_modules" >> $GITHUB_PATH
 
       - name: Deploy/Shopify Push
-        run: shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live
+        run: |
+          if [ -z "$SHOP_THEME_ID" ]; then
+            echo "SHOP_THEME_ID is not set"
+            exit 1
+          fi
+          shopify theme push --path src --store=$SHOP_STORE --theme $SHOP_THEME_ID --password $SHOP_THEME_TOKEN --allow-live
