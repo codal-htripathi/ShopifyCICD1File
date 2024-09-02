@@ -73,9 +73,9 @@ jobs:
           prerelease: false
           draft: false
           title: "Release ${{ steps.next_version.outputs.next_version }}"
-          files: |
-            LICENSE.txt
-            *.jar
+          # files: |
+          #   LICENSE.txt
+          #   *.jar
 
       - name: "Update Wiki with New Version"
         run: |
