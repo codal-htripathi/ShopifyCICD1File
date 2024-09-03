@@ -45,7 +45,7 @@ jobs:
         run: |
           if [[ $GITHUB_BASE_REF == "main" ]]  
           then
-            echo "ENV_PREFIX=PRODUCTION" >> $GITHUB_ENV    
+            echo "ENV_PREFIX=MAIN" >> $GITHUB_ENV    
           elif [[ $GITHUB_BASE_REF == "staging" ]]  
           then
             echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV
