@@ -16,32 +16,29 @@ jobs:
 
       - name: "Checkout Wiki"
         run: |
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
-          cd $(basename "${GITHUB_REPOSITORY}").wiki
-          git checkout main || git checkout -b main
-          echo "Checked out the Wiki repository."
+          git clone https://github.com/codal-htripathi/ShopifyCICD1File.wiki.git
+          cd ShopifyCICD1File.wiki
           cat version.textile
 
-      - name: "Get the current version from Wiki"
-        id: current_version
+      - name: "Get the latest tag from Wiki"
+        id: tag
         run: |
-          cd $(basename "${GITHUB_REPOSITORY}").wiki
-          current_version=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-          echo "Current version from Wiki: $current_version"
-          echo "current_version=$current_version" >> $GITHUB_ENV
+          latest_tag=$(grep -oE 'IND_RELEASE-v[0-9]+\.[0-9]+\.[0-9]+' ShopifyCICD1File.wiki/version.textile | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1 || echo "v0.0.0")
+          echo "Latest tag from Wiki: $latest_tag"
+          echo "::set-output name=latest_tag::$latest_tag"
 
       - name: "Get version type from commit message"
         id: get_version_type
         run: |
           version_type=$(git log -1 --pretty=%B | grep -oE 'patch|minor|major' || echo "patch")
-          echo "version_type=$version_type" >> $GITHUB_ENV
+          echo "::set-output name=version_type::$version_type"
 
       - name: "Calculate next version"
         id: next_version
         run: |
-          current_version=${{ env.current_version }}
-          version_type=${{ env.version_type }}
-          IFS='.' read -r -a parts <<< "${current_version/v/}"
+          latest_tag=${{ steps.tag.outputs.latest_tag }}
+          version_type=${{ steps.get_version_type.outputs.version_type }}
+          IFS='.' read -r -a parts <<< "${latest_tag/v/}"
           
           if [ "$version_type" = "patch" ]; then
             next_patch=$((parts[2]+1))
@@ -55,7 +52,7 @@ jobs:
           fi
 
           echo "Next version: $next_version"
-          echo "next_version=$next_version" >> $GITHUB_ENV
+          echo "::set-output name=next_version::$next_version"
 
       - name: "Build & test"
         run: |
@@ -63,41 +60,32 @@ jobs:
 
       - name: "Create new tag"
         run: |
-          git tag ${{ env.next_version }}
-          git push origin ${{ env.next_version }}
+          git tag ${{ steps.next_version.outputs.next_version }}
+          git push origin ${{ steps.next_version.outputs.next_version }}
 
       - name: "Create GitHub Release"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.next_version }}"
+          automatic_release_tag: "${{ steps.next_version.outputs.next_version }}"
           prerelease: false
           draft: false
-          title: "Release ${{ env.next_version }}"
+          title: "Release ${{ steps.next_version.outputs.next_version }}"
+          files: |
+            LICENSE.txt
+            *.jar
 
       - name: "Update Wiki with New Version"
         run: |
-          cd $(basename "${GITHUB_REPOSITORY}").wiki
-          echo "Current version.textile contents before update:"
-          cat version.textile
-
-          # Update the version in the wiki file
-          sed -i "s/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ env.next_version }}/g" version.textile
-
-          echo "Updated version.textile contents after update:"
-          cat version.textile
-
+          cd ShopifyCICD1File.wiki
+          sed -i 's/IND_RELEASE-v[0-9]\+\.[0-9]\+\.[0-9]\+/IND_RELEASE-${{ steps.next_version.outputs.next_version }}/g' version.textile
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add version.textile
-          git commit -m "Update version to ${{ env.next_version }}" || echo "No changes to commit"
-          
-          # Push changes to the wiki
-          git push origin main
+          git commit -m "Update version to ${{ steps.next_version.outputs.next_version }}"
 
-      - name: "Verify Wiki Update"
-        run: |
-          cd $(basename "${GITHUB_REPOSITORY}").wiki
-          git log -1 --pretty=%B
-          echo "Version file content after push:"
-          cat version.textile
+          # Use the correct branch name
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/codal-htripathi/ShopifyCICD1File.wiki.git
+          
+          # Push to the correct branch (likely master)
+          git push origin master
