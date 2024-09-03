@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const bot = require('./utils');
+const bot = require('./utils/bot');
 const checkThemeUpdate = require('./check-theme-update');
 
 /**
