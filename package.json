@@ -96,7 +96,7 @@
     ]
   },
   "resolutions": {
-    "semver-regex": "3.1.4",
-    "loader-utils": "2.0.3"
+    "semver-regex": "2.0.0",
+    "loader-utils": "1.1.0"
   }
 }
