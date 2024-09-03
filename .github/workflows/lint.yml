@@ -58,17 +58,17 @@ jobs:
 
       - name: Set env variable
         env:
-        #   SHOP_ACCESS_TOKEN: "${{ env.ENV_PREFIX }}_ACCESS_TOKEN"
+          SHOP_ACCESS_TOKEN: "${{ env.ENV_PREFIX }}_ACCESS_TOKEN"
           SHOP_STORE: "${{ env.ENV_PREFIX }}_STORE"
           SHOP_THEME_TOKEN: "${{ env.ENV_PREFIX }}_THEME_TOKEN"
           SHOP_THEME_ID: "${{ env.ENV_PREFIX }}_THEME_ID"
-        #   SHOP_API_KEY: "${{ env.ENV_PREFIX }}_API_KEY"
+          SHOP_API_KEY: "${{ env.ENV_PREFIX }}_API_KEY"
         run: |
           echo "SHOP_ACCESS_TOKEN=${{ secrets[env.SHOP_ACCESS_TOKEN] }}" >> $GITHUB_ENV
           echo "SHOP_STORE=${{ secrets[env.SHOP_STORE] }}" >> $GITHUB_ENV
           echo "SHOP_THEME_ID=${{ secrets[env.SHOP_THEME_ID] }}" >> $GITHUB_ENV
           echo "SHOP_THEME_TOKEN=${{ secrets[env.SHOP_THEME_TOKEN] }}" >> $GITHUB_ENV
-        #   echo "SHOP_API_KEY=${{ secrets[env.SHOP_API_KEY] }}" >> $GITHUB_ENV
+          echo "SHOP_API_KEY=${{ secrets[env.SHOP_API_KEY] }}" >> $GITHUB_ENV
         
       - name: Checkout branch
         uses: actions/checkout@v4
