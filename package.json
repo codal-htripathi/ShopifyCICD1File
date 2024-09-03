@@ -1,0 +1,100 @@
+{
+  "name": "kanopi-shopify-theme",
+  "version": "1.0.0",
+  "description": "Upgrade to Shopify Online Store 2.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "yarn theme:watch",
+    "push": "yarn theme:deploy --allow-live",
+    "theme:watch": "node ./scripts/watch-theme.js",
+    "theme:open": "node ./scripts/open-theme.js",
+    "theme:deploy": "node ./scripts/deploy-theme.js",
+    "theme:download": "node ./scripts/download-theme.js",
+    "lint": "eslint '**/*.js'",
+    "check:config": "yarn checkThemeUpdate --files config/settings_data.json",
+    "check:locale": "yarn checkThemeUpdate --files locale/en.default.json",
+    "check:all": "yarn checkThemeUpdate",
+    "checkThemeUpdate": "node ./scripts/check-theme-update.js",
+    "download:settings": "yarn theme:download --files config/settings_data.json config/settings_data.json locales/en.default.json templates/404.json templates/article.json templates/blog.json templates/cart.json templates/collection.json templates/collection.sub-collections.json templates/index.json templates/page.about.json templates/page.about2.json templates/page.brands.json templates/page.contact.json templates/page.custom1.json templates/page.custom2.json templates/page.custom3.json templates/page.faq.json templates/page.faq2.json templates/page.json templates/page.landing1.json templates/page.lookbook.json templates/page.wishlist.json templates/product.accessories_template.json templates/product.bundles_template.json templates/product.cooledge_template.json templates/product.deco-template.json templates/product.grid-template.json templates/product.json templates/product.spacekits_template.json templates/product.tile-template.json templates/product.tile-pdp.json templates/product.wall-template.json templates/search.json templates/product.sample_bundles_template.json templates/page.return-policy.json templates/page.register.json templates/page.thankyou.json templates/page.replacement-ceilings.json templates/page.promotional.json templates/page.video-library.json templates/page.kanopi-ceiling-gallery.json",
+    "download:config": "yarn theme:download --files config/settings_data.json",
+    "download:locale": "yarn theme:download --files locale/en.default.json",
+    "development": "mix",
+    "watch": "mix watch",
+    "watch:tailwind": "mix watch --mix-config webpack-tailwind.mix.js",
+    "production": "mix --mix-config=webpack.mix.js --production",
+    "production:tailwind": "mix --mix-config=webpack-tailwind.mix.js --production",
+    "shopify:share": "shopify theme share --store=${env.THEMEKIT_STORE}",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boltdv/kanopi-shopify-theme.git"
+  },
+  "author": "Argano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/boltdv/kanopi-shopify-theme/issues"
+  },
+  "homepage": "https://github.com/boltdv/kanopi-shopify-theme#readme",
+  "dependencies": {
+    "@shopify/cli": "^3.56.1",
+    "@sentry/browser": "^6.14.1",
+    "@sentry/tracing": "^6.14.1",
+    "@shopify/themekit": "^1.1.9",
+    "axios": "^1.6.7",
+    "bootstrap": "^4.6.0",
+    "bootstrap-select": "^1.13.18",
+    "dotenv": "^16.4.4",
+    "floating-vue": "^2.0.0-beta.20",
+    "laravel-mix": "6.0.49",
+    "slick-carousel": "^1.8.1",
+    "slugify": "^1.6.6",
+    "tailwindcss": "^3.4.1",
+    "vue": "^3.4.19",
+    "vue-loader": "^17.4.2",
+    "vue-router": "^4.2.5",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.4.19",
+    "bluebird": "^3.7.2",
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0",
+    "dayjs": "^1.11.10",
+    "diff": "^5.2.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-standard": "^5.0.0",
+    "fs-extra": "^11.2.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.7.0",
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
+    "pretty-quick": "^4.0.0",
+    "resolve-url-loader": "^5.0.0",
+    "sass": "^1.70.0",
+    "sass-loader": "14.1.0",
+    "shopify-api-node": "^3.13.1",
+    "standard": "^17.1.0",
+    "vue-loader": "^17.4.2",
+    "yargs": "^15.4.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ],
+    "*.json": [
+      "pretty-quick --staged"
+    ]
+  },
+  "resolutions": {
+    "semver-regex": "3.1.4",
+    "loader-utils": "2.0.3"
+  }
+}
