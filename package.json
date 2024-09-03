@@ -15,7 +15,7 @@
     "check:locale": "yarn checkThemeUpdate --files locale/en.default.json",
     "check:all": "yarn checkThemeUpdate",
     "checkThemeUpdate": "node ./scripts/check-theme-update.js",
-    "download:settings": "yarn theme:download --files config/settings_data.json config/settings_data.json locales/en.default.json templates/404.json templates/article.json templates/blog.json templates/cart.json templates/collection.json templates/collection.sub-collections.json templates/index.json templates/page.about.json templates/page.about2.json templates/page.brands.json templates/page.contact.json templates/page.custom1.json templates/page.custom2.json templates/page.custom3.json templates/page.faq.json templates/page.faq2.json templates/page.json templates/page.landing1.json templates/page.lookbook.json templates/page.wishlist.json templates/product.accessories_template.json templates/product.bundles_template.json templates/product.cooledge_template.json templates/product.deco-template.json templates/product.grid-template.json templates/product.json templates/product.spacekits_template.json templates/product.tile-template.json templates/product.tile-pdp.json templates/product.wall-template.json templates/search.json templates/product.sample_bundles_template.json templates/page.return-policy.json templates/page.register.json templates/page.thankyou.json templates/page.replacement-ceilings.json templates/page.promotional.json templates/page.video-library.json templates/page.kanopi-ceiling-gallery.json",
+    "download:settings": "yarn theme:download --files config/settings_data.json locales/en.default.json templates/404.json templates/article.json templates/blog.json templates/cart.json templates/collection.json templates/gift_card.json templates/index.json templates/list-collections.json templates/page.contact.json templates/page.json templates/product.json templates/search.json",
     "download:config": "yarn theme:download --files config/settings_data.json",
     "download:locale": "yarn theme:download --files locale/en.default.json",
     "development": "mix",
@@ -28,14 +28,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/boltdv/kanopi-shopify-theme.git"
+    "url": "git+https://github.com/codal-htripathi/ShopifyCICD1File.git"
   },
-  "author": "Argano",
+  "author": "codal-htripathi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/boltdv/kanopi-shopify-theme/issues"
+    "url": "https://github.com/codal-htripathi/ShopifyCICD1File/issues"
   },
-  "homepage": "https://github.com/boltdv/kanopi-shopify-theme#readme",
+  "homepage": "https://github.com/codal-htripathi/ShopifyCICD1File#readme",
   "dependencies": {
     "@shopify/cli": "^3.56.1",
     "@sentry/browser": "^6.14.1",
