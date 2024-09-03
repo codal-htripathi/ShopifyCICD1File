@@ -1,0 +1,128 @@
+name: Lint and Comment on pull request
+on: 
+  pull_request:
+    branches:
+      - main
+      - staging
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+
+      - name: setup node.js ${{ matrix.node-version }} 
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Yarn Install with cache
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+  theme_file_check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+
+      - name: Print output
+        run: |
+          echo "GITHUB_BASE_REF = $GITHUB_BASE_REF"
+          echo "GITHUB_HEAD_REF = $GITHUB_HEAD_REF"
+          
+      - name: Set env prefix
+        shell: bash
+        run: |
+          if [[ $GITHUB_BASE_REF == "main" ]]  
+          then
+            echo "ENV_PREFIX=PRODUCTION" >> $GITHUB_ENV    
+          elif [[ $GITHUB_BASE_REF == "staging" ]]  
+          then
+            echo "ENV_PREFIX=STAGING" >> $GITHUB_ENV
+          elif [[ $GITHUB_BASE_REF == "dev" ]]  
+          then
+            echo "ENV_PREFIX=DEV" >> $GITHUB_ENV
+          else
+            echo "ENV_PREFIX=$(echo ${GITHUB_BASE_REF} | tr '[a-z]' '[A-Z]')" >> $GITHUB_ENV
+          fi
+
+      - name: Set env variable
+        env:
+        #   SHOP_ACCESS_TOKEN: "${{ env.ENV_PREFIX }}_ACCESS_TOKEN"
+          SHOP_STORE: "${{ env.ENV_PREFIX }}_STORE"
+          SHOP_THEME_TOKEN: "${{ env.ENV_PREFIX }}_THEME_TOKEN"
+          SHOP_THEME_ID: "${{ env.ENV_PREFIX }}_THEME_ID"
+        #   SHOP_API_KEY: "${{ env.ENV_PREFIX }}_API_KEY"
+        run: |
+          echo "SHOP_ACCESS_TOKEN=${{ secrets[env.SHOP_ACCESS_TOKEN] }}" >> $GITHUB_ENV
+          echo "SHOP_STORE=${{ secrets[env.SHOP_STORE] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_ID=${{ secrets[env.SHOP_THEME_ID] }}" >> $GITHUB_ENV
+          echo "SHOP_THEME_TOKEN=${{ secrets[env.SHOP_THEME_TOKEN] }}" >> $GITHUB_ENV
+        #   echo "SHOP_API_KEY=${{ secrets[env.SHOP_API_KEY] }}" >> $GITHUB_ENV
+        
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        # important to checkout the actual branch instead of merge commit Github checks out by default
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Yarn Install with cache
+        run: yarn install --frozen-lockfile
+
+      - name: Comment to pull request
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const path = require('path');
+            const reportThemeChange = require(path.resolve('./scripts/report-theme-change.js'));
+            const files = ['config/settings_data.json', 
+            'locales/en.default.json', 
+            'templates/404.json', 
+            'templates/article.json', 
+            'templates/blog.json', 
+            'templates/cart.json', 
+            'templates/collection.json', 
+            'templates/collection.sub-collections.json', 
+            'templates/index.json', 
+            'templates/page.about.json', 
+            'templates/page.about2.json', 
+            'templates/page.brands.json', 
+            'templates/page.contact.json', 
+            'templates/page.custom1.json', 
+            'templates/page.custom2.json', 
+            'templates/page.custom3.json', 
+            'templates/page.faq.json', 
+            'templates/page.faq2.json', 
+            'templates/page.json', 
+            'templates/page.landing1.json', 
+            'templates/page.lookbook.json', 
+            'templates/page.wishlist.json', 
+            'templates/product.accessories_template.json', 
+            'templates/product.bundles_template.json', 
+            'templates/product.cooledge_template.json', 
+            'templates/product.deco-template.json', 
+            'templates/product.grid-template.json', 
+            'templates/product.json', 
+            'templates/product.sample_bundles_template.json',
+            'templates/product.spacekits_template.json', 
+            'templates/product.tile-template.json', 
+            'templates/product.tile-pdp.json', 
+            'templates/product.wall-template.json',
+            'templates/search.json'];
+            reportThemeChange({ github, context, files, isPR: true });
