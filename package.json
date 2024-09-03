@@ -53,7 +53,8 @@
     "vue": "^3.4.19",
     "vue-loader": "^17.4.2",
     "vue-router": "^4.2.5",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@vue/compiler-sfc": "^3.4.19",
